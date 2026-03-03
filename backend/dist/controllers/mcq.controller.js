@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mcqController = exports.MCQController = void 0;
 const parser_service_1 = require("../services/parser.service");
-const gemini_service_1 = require("../services/gemini.service");
+const generator_service_1 = require("../services/generator.service");
 class MCQController {
     async generateFromTopic(req, res) {
         const { topic, difficulty, count } = req.body;
@@ -10,7 +10,7 @@ class MCQController {
             return res.status(400).json({ success: false, error: "Topic is required" });
         try {
             const content = `The topic is ${topic}. Please generate accurate and high-quality MCQs covering key concepts, definitions, and applications related to this topic.`;
-            const mcqs = await gemini_service_1.geminiService.generateMCQs(content, count || 5, difficulty || "MEDIUM");
+            const mcqs = await generator_service_1.generatorService.generateMCQs(content, count || 5, difficulty || "MEDIUM");
             res.json({ success: true, mcqs });
         }
         catch (error) {
@@ -23,7 +23,7 @@ class MCQController {
             return res.status(400).json({ success: false, error: "URL is required" });
         try {
             const content = await parser_service_1.parserService.parseWebsite(url);
-            const mcqs = await gemini_service_1.geminiService.generateMCQs(content, count || 5, difficulty || "MEDIUM");
+            const mcqs = await generator_service_1.generatorService.generateMCQs(content, count || 5, difficulty || "MEDIUM");
             res.json({ success: true, mcqs });
         }
         catch (error) {
@@ -50,7 +50,7 @@ class MCQController {
             if (content.length > 30000) {
                 content = content.substring(0, 30000); // Temporary limit for basic version
             }
-            const mcqs = await gemini_service_1.geminiService.generateMCQs(content, count || 5, difficulty || "MEDIUM");
+            const mcqs = await generator_service_1.generatorService.generateMCQs(content, count || 5, difficulty || "MEDIUM");
             res.json({ success: true, mcqs });
         }
         catch (error) {

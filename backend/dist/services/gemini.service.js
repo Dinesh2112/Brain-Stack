@@ -8,10 +8,23 @@ const generative_ai_1 = require("@google/generative-ai");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const PRIMARY_MODEL = "gemini-1.5-flash";
 class GeminiService {
     model;
+    getModel() {
+        if (this.model)
+            return this.model;
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            console.error("[GEMINI] CRITICAL: GEMINI_API_KEY is missing from environment.");
+            throw new Error("AI Service configuration missing.");
+        }
+        this.model = genAI.getGenerativeModel({ model: PRIMARY_MODEL });
+        console.log(`[GEMINI] Service initialized with model: ${PRIMARY_MODEL}`);
+        return this.model;
+    }
     constructor() {
-        this.model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        // Model initialized lazily when needed
     }
     chunkContent(content, maxLen = 20000) {
         if (content.length <= maxLen)
@@ -23,7 +36,9 @@ class GeminiService {
         const end = content.substring(content.length - third);
         return `${start}\n...[truncated]...\n${mid}\n...[truncated]...\n${end}`;
     }
-    async generateMCQs(content, count = 5, difficulty = "MEDIUM") {
+    async generateMCQs(content, count = 5, difficulty = "MEDIUM", retryCount = 2) {
+        const activeModel = this.getModel();
+        console.log(`[GEMINI] Generating MCQs with model: ${activeModel.model}...`);
         const processedContent = this.chunkContent(content);
         const prompt = `
       You are an expert educational AI specialized in ${difficulty} level assessments. 
@@ -62,6 +77,12 @@ class GeminiService {
             return JSON.parse(jsonMatch[0]);
         }
         catch (error) {
+            // Retry logic for 503 / Service Unavailable
+            if (retryCount > 0 && (error.message.includes("503") || error.message.includes("Service Unavailable") || error.message.includes("overloaded"))) {
+                console.warn(`[GEMINI] Service busy, retrying... (${retryCount} retries left)`);
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s
+                return this.generateMCQs(content, count, difficulty, retryCount - 1);
+            }
             console.error("Gemini Error Details:", {
                 message: error.message,
                 stack: error.stack,

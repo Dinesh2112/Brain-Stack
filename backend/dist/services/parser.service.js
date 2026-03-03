@@ -37,14 +37,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parserService = exports.ParserService = void 0;
-const pdf = require('pdf-parse');
+const pdf2json_1 = __importDefault(require("pdf2json"));
 const mammoth_1 = __importDefault(require("mammoth"));
 const axios_1 = __importDefault(require("axios"));
 const cheerio = __importStar(require("cheerio"));
 class ParserService {
     async parsePDF(buffer) {
-        const data = await pdf(buffer);
-        return data.text;
+        return new Promise((resolve, reject) => {
+            const pdfParser = new pdf2json_1.default();
+            pdfParser.on("pdfParser_dataError", (errData) => reject(new Error(errData.parserError)));
+            pdfParser.on("pdfParser_dataReady", (pdfData) => {
+                const text = pdfData.formImage.Pages.map((page) => page.Texts.map((textObj) => decodeURIComponent(textObj.R[0].T)).join(' ')).join('\n');
+                resolve(text);
+            });
+            pdfParser.parseBuffer(buffer);
+        });
     }
     async parseWord(buffer) {
         const data = await mammoth_1.default.extractRawText({ buffer });

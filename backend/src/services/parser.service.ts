@@ -1,15 +1,27 @@
-const pdf = require('pdf-parse');
+import PDFParser from 'pdf2json';
 import mammoth from 'mammoth';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
 export class ParserService {
     async parsePDF(buffer: Buffer): Promise<string> {
-        const data = await pdf(buffer);
-        return data.text;
+        return new Promise((resolve, reject) => {
+            const pdfParser = new PDFParser();
+
+            pdfParser.on("pdfParser_dataError", (errData: any) => reject(new Error(errData.parserError)));
+            pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
+                const text = pdfData.formImage.Pages.map((page: any) =>
+                    page.Texts.map((textObj: any) => decodeURIComponent(textObj.R[0].T)).join(' ')
+                ).join('\n');
+                resolve(text);
+            });
+
+            pdfParser.parseBuffer(buffer);
+        });
     }
 
     async parseWord(buffer: Buffer): Promise<string> {
+
         const data = await mammoth.extractRawText({ buffer });
         return data.value;
     }
