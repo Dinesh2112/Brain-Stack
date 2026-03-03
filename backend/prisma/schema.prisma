@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  name              String?
+  password          String
+  totalTestsTaken   Int      @default(0)
+  subscriptionPlan  String   @default("FREE")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  tests             Test[]
+  mastery           Mastery[]
+}
+
+model Test {
+  id            String     @id @default(uuid())
+  userId        String?
+  user          User?      @relation(fields: [userId], references: [id])
+  topic         String
+  difficulty    String     @default("MEDIUM")
+  score         Int?
+  totalQ        Int
+  duration      Int? 
+  questions     Question[]
+  createdAt     DateTime   @default(now())
+}
+
+model Question {
+  id            String   @id @default(uuid())
+  testId        String
+  test          Test?     @relation(fields: [testId], references: [id])
+  question      String
+  options       String[] 
+  correctAnswer String
+  explanation   String?
+  userAnswer    String?
+  isCorrect     Boolean?
+  timeSpent     Int? // In seconds per question
+}
+
+model Mastery {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  topic           String
+  confidenceScore Float    @default(0) // 0 to 100
+  lastAttempted   DateTime @default(now())
+}

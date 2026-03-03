@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050505;
+  --foreground: #e5e7eb;
+  
+  --brand-prime: #ccff00; /* Cyber Lime */
+  --brand-secondary: #00f0ff;
+  --brand-surface: #0f1115;
+  --foreground: #ffffff;
+  --accent: #FFB000; /* Vivid Amber - More unique than generic AI Green */
+  --accent-secondary: #00f0ff;
+  --card-bg: #0a0a0a; /* More solid background */
+  --card-border: rgba(255, 255, 255, 0.08); /* Stronger border */
+  --glass-bg: rgba(10, 10, 10, 0.95); /* High opacity for solid feel */
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--background);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* Custom Grain Texture Overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@layer base {
+  /* Base Styles */
+  .glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(10, 10, 10, 0.98);
+  }
+  
+  /* Premium Buttons */
+  .premium-button {
+    @apply relative inline-flex items-center gap-2 px-8 py-4 rounded-xl font-black uppercase tracking-widest transition-all duration-300 active:scale-95;
+  }
+  
+  .premium-button.primary {
+    background: var(--accent);
+    color: #000;
+    box-shadow: 0 4px 0px rgba(0, 0, 0, 0.2);
+  }
+
+  .premium-button.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 176, 0, 0.3);
+    filter: brightness(1.1);
+  }
+
+  .premium-button.secondary {
+  background: #1a1a1a;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 0px rgba(0, 0, 0, 0.2);
+}
+
+.premium-button.secondary:hover {
+  background: #252525;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+  
+  /* Inputs */
+  .premium-input {
+    background: #0f0f0f;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    color: #fff;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .premium-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #151515;
+    box-shadow: 0 0 0 4px rgba(255, 176, 0, 0.1);
+  }
+
+  /* Select Styling */
+  select.premium-input {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1.5rem center;
+      background-size: 1rem;
+  }
+
+  select.premium-input option {
+    padding: 12px;
+  }
+
+  /* Hide number input spinners (arrows) */
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield; /* Firefox */
+    appearance: textfield;
+  }
+}
+
+
+.text-gradient {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-prime);
+}
+
+/* Typography Enhancements */
+h1, h2, h3, h4 {
+  letter-spacing: -0.04em;
+  font-weight: 800;
+}
