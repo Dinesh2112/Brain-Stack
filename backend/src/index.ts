@@ -52,14 +52,17 @@ app.use((err: any, req: Request, res: Response, next: any) => {
     });
 });
 
-// ONLY listen on local port during development
-if (process.env.NODE_ENV !== 'production') {
+// ONLY listen on local port during development (Not on Vercel)
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         logger.info(`Server initialized successfully on http://localhost:${PORT}`);
     });
+} else {
+    logger.info("Server running in Serverless Mode (Vercel)");
 }
 
 // CRITICAL for Vercel Serverless
 export default app;
+
 
 
