@@ -36,10 +36,10 @@ app.use('/api/auth', authRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     res.json({
-        service: 'Neural Assessment Engine API',
+        service: 'BrainStack Neural Engine API',
         status: 'Operational',
-        version: '1.0.0',
-        environment: process.env.NODE_ENV || 'development'
+        version: '1.1.0',
+        environment: process.env.NODE_ENV || 'production'
     });
 });
 
@@ -52,7 +52,14 @@ app.use((err: any, req: Request, res: Response, next: any) => {
     });
 });
 
-app.listen(PORT, () => {
-    logger.info(`Server initialized successfully on http://localhost:${PORT}`);
-});
+// ONLY listen on local port during development
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        logger.info(`Server initialized successfully on http://localhost:${PORT}`);
+    });
+}
+
+// CRITICAL for Vercel Serverless
+export default app;
+
 
