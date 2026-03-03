@@ -19,10 +19,22 @@ export interface MCQ {
 export class GeminiService {
     private model: any;
 
-    constructor() {
+    private getModel() {
+        if (this.model) return this.model;
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            console.error("[GEMINI] CRITICAL: GEMINI_API_KEY is missing from environment.");
+            throw new Error("AI Service configuration missing.");
+        }
         this.model = genAI.getGenerativeModel({ model: PRIMARY_MODEL });
         console.log(`[GEMINI] Service initialized with model: ${PRIMARY_MODEL}`);
+        return this.model;
     }
+
+    constructor() {
+        // Model initialized lazily when needed
+    }
+
 
 
     private chunkContent(content: string, maxLen: number = 20000): string {
@@ -36,8 +48,10 @@ export class GeminiService {
     }
 
     async generateMCQs(content: string, count: number = 5, difficulty: string = "MEDIUM", retryCount: number = 2): Promise<MCQ[]> {
-        console.log(`[GEMINI] Generating MCQs with model: ${this.model.model}...`);
+        const activeModel = this.getModel();
+        console.log(`[GEMINI] Generating MCQs with model: ${activeModel.model}...`);
         const processedContent = this.chunkContent(content);
+
 
         const prompt = `
       You are an expert educational AI specialized in ${difficulty} level assessments. 

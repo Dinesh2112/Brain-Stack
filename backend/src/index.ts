@@ -34,13 +34,27 @@ app.use((req, res, next) => {
 app.use('/api/mcq', mcqRoutes);
 app.use('/api/auth', authRoutes);
 
-app.get('/', (req: Request, res: Response) => {
-    res.json({
-        service: 'BrainStack Neural Engine API',
-        status: 'Operational',
-        version: '1.1.0',
-        environment: process.env.NODE_ENV || 'production'
-    });
+app.get('/', async (req: Request, res: Response) => {
+    try {
+        // Simple health check for DB
+        await (req.app.get('prisma') || import('./services/prisma.service').then(m => m.default)).$connect();
+
+        res.json({
+            name: 'BrainStack AI Assessment Engine',
+            status: 'Operational',
+            db: 'Connected',
+            version: '1.2.0',
+            region: process.env.VERCEL_REGION || 'local'
+        });
+    } catch (e: any) {
+        res.json({
+            name: 'BrainStack AI Assessment Engine',
+            status: 'Operational (DB Warning)',
+            db: 'Disconnected',
+            error: e.message,
+            version: '1.2.0'
+        });
+    }
 });
 
 // Global Error Handler
