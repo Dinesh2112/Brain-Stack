@@ -37,7 +37,8 @@ app.use('/api/auth', authRoutes);
 app.get('/', async (req: Request, res: Response) => {
     try {
         // Simple health check for DB
-        await (req.app.get('prisma') || import('./services/prisma.service').then(m => m.default)).$connect();
+        const prismaInstance = req.app.get('prisma') || (await import('./services/prisma.service')).default;
+        await prismaInstance.$connect();
 
         res.json({
             name: 'BrainStack AI Assessment Engine',

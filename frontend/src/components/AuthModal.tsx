@@ -34,7 +34,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
         try {
             const endpoint = mode === 'LOGIN' ? '/api/auth/login' : '/api/auth/signup';
-            const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5001').replace('/api/mcq', '');
+            const rawApiBase = (process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5001').replace('/api/mcq', '');
+            const API_BASE = rawApiBase.replace(/\/+$/, '');
 
 
             const response = await axios.post(`${API_BASE}${endpoint}`, {
