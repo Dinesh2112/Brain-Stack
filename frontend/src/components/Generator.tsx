@@ -26,8 +26,10 @@ function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-const rawApiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5001/api/mcq';
-const API_BASE = rawApiBase.replace(/\/+$/, ''); // Remove trailing slashes
+let API_BASE = (process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5001/api/mcq').replace(/\/+$/, '');
+if (!API_BASE.endsWith('/api/mcq')) {
+    API_BASE += '/api/mcq';
+}
 
 
 interface GeneratorProps {
