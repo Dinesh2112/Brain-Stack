@@ -60,3 +60,12 @@ model Mastery {
   confidenceScore Float    @default(0) // 0 to 100
   lastAttempted   DateTime @default(now())
 }
+
+model Cache {
+  id          String   @id @default(uuid())
+  key         String   @unique // Topic name or hash of content
+  difficulty  String
+  questions   Json     // Store the array of MCQs
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime?
+}

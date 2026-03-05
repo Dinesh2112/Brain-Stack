@@ -1,32 +1,26 @@
-import Groq from "groq-sdk";
-import dotenv from "dotenv";
-import { MCQ } from "./gemini.service";
-
-dotenv.config();
-
-const groq = new Groq({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.groqService = exports.GroqService = void 0;
+const groq_sdk_1 = __importDefault(require("groq-sdk"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const groq = new groq_sdk_1.default({
     apiKey: process.env.GROQ_API_KEY || "",
 });
-
-export class GroqService {
-    private models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "gemma2-9b-it"];
-
-    private chunkContent(content: string, maxLen: number = 20000): string {
-        if (content.length <= maxLen) return content;
+class GroqService {
+    chunkContent(content, maxLen = 20000) {
+        if (content.length <= maxLen)
+            return content;
         const half = Math.floor(maxLen / 2);
         const start = content.substring(0, half);
         const end = content.substring(content.length - half);
         return `${start}\n...[truncated]...\n${end}`;
     }
-
-    async generateMCQs(content: string, count: number = 5, difficulty: string = "MEDIUM", modelIndex: number = 0): Promise<MCQ[]> {
-        if (modelIndex >= this.models.length) {
-            throw new Error("All Groq models failed or are rate-limited.");
-        }
-
-        const currentModel = this.models[modelIndex];
+    async generateMCQs(content, count = 5, difficulty = "MEDIUM") {
         const processedContent = this.chunkContent(content);
-
         const prompt = `
             You are an expert academic assessment AI.
             Generate exactly ${count} multiple choice questions (MCQs) from the provided content.
@@ -47,9 +41,7 @@ export class GroqService {
                 "topic": "The main topic or sub-topic"
             }
         `;
-
         try {
-            console.log(`[GROQ] Attempting generation with model: ${currentModel}`);
             const completion = await groq.chat.completions.create({
                 messages: [
                     {
@@ -61,31 +53,22 @@ export class GroqService {
                         content: prompt,
                     },
                 ],
-                model: currentModel,
+                model: "llama-3.3-70b-versatile",
                 response_format: { type: "json_object" },
             });
-
             const text = completion.choices[0]?.message?.content || "{}";
             const data = JSON.parse(text);
-
             if (data.questions && Array.isArray(data.questions)) {
                 return data.questions.slice(0, count);
             }
-
             throw new Error("Invalid output format from Groq");
-        } catch (error: any) {
-            // Check for rate limit (429) or other errors to trigger fallback
-            const isRateLimit = error.status === 429 || error.message.includes("rate_limit") || error.message.includes("429");
-
-            if (isRateLimit && modelIndex < this.models.length - 1) {
-                console.warn(`[GROQ] Rate limit hit for ${currentModel}. Falling back to ${this.models[modelIndex + 1]}...`);
-                return this.generateMCQs(content, count, difficulty, modelIndex + 1);
-            }
-
-            console.error(`[GROQ ERROR] [${currentModel}]`, error.message);
-            throw new Error(`Groq processing failed on ${currentModel}: ${error.message}`);
+        }
+        catch (error) {
+            console.error("[GROQ ERROR]", error);
+            throw new Error(`Groq processing failed: ${error.message}`);
         }
     }
 }
-
-export const groqService = new GroqService();
+exports.GroqService = GroqService;
+exports.groqService = new GroqService();
+//# sourceMappingURL=groq.service.js.map
