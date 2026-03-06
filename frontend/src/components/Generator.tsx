@@ -14,7 +14,9 @@ import {
     Settings2,
     Trophy,
     ArrowRight,
-    Layout
+    Layout,
+    Timer,
+    ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDropzone } from 'react-dropzone';
@@ -33,7 +35,7 @@ if (!API_BASE.endsWith('/api/mcq')) {
 
 
 interface GeneratorProps {
-    onMCQsGenerated: (mcqs: MCQ[]) => void;
+    onMCQsGenerated: (mcqs: MCQ[], durationMinutes: number) => void;
 }
 
 export const Generator: React.FC<GeneratorProps> = ({ onMCQsGenerated }) => {
@@ -47,6 +49,14 @@ export const Generator: React.FC<GeneratorProps> = ({ onMCQsGenerated }) => {
     const [file, setFile] = useState<File | null>(null);
     const [difficulty, setDifficulty] = useState('MEDIUM');
     const [qCount, setQCount] = useState(10);
+    const [duration, setDuration] = useState(10); // Default 10 mins
+    const [isDifficultyOpen, setIsDifficultyOpen] = useState(false);
+
+    const difficultyOptions = [
+        { id: 'EASY', label: 'Beginner' },
+        { id: 'MEDIUM', label: 'Intermediate' },
+        { id: 'HARD', label: 'Expert' },
+    ];
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop: (acceptedFiles) => setFile(acceptedFiles[0]),
@@ -77,7 +87,7 @@ export const Generator: React.FC<GeneratorProps> = ({ onMCQsGenerated }) => {
             }
 
             if (response.data.success) {
-                onMCQsGenerated(response.data.mcqs);
+                onMCQsGenerated(response.data.mcqs, duration);
             } else {
                 throw new Error(response.data.error || "Generation failed");
             }
@@ -149,7 +159,7 @@ export const Generator: React.FC<GeneratorProps> = ({ onMCQsGenerated }) => {
                                     <input
                                         type="text"
                                         placeholder="Enter anything (e.g. History, Biology, React...)"
-                                        className="premium-input w-full text-lg placeholder:opacity-30 border-2 border-transparent focus:border-[#FFB00033]"
+                                        className="premium-input w-full text-lg placeholder:text-gray-600 border-2 border-transparent focus:border-[#FFB00033]"
                                         value={topic}
                                         onChange={(e) => setTopic(e.target.value)}
                                     />
@@ -165,7 +175,7 @@ export const Generator: React.FC<GeneratorProps> = ({ onMCQsGenerated }) => {
                                     <input
                                         type="url"
                                         placeholder="Paste a link to an article or document..."
-                                        className="premium-input w-full text-lg placeholder:opacity-30 border-2 border-transparent focus:border-[#00f0ff33]"
+                                        className="premium-input w-full text-lg placeholder:text-gray-600 border-2 border-transparent focus:border-[#00f0ff33]"
                                         value={url}
                                         onChange={(e) => setUrl(e.target.value)}
                                     />
@@ -209,34 +219,81 @@ export const Generator: React.FC<GeneratorProps> = ({ onMCQsGenerated }) => {
                     </AnimatePresence>
 
                     {/* Operational Settings */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-10 border-t border-white/[0.1]">
-                        <div className="space-y-4">
-                            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 flex items-center gap-2">
-                                <Settings2 className="w-3 h-3" /> Select Difficulty
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10 border-t border-white/[0.1]">
+                        <div className="space-y-4 relative">
+                            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 flex items-center gap-2">
+                                <Settings2 className="w-3 h-3 text-[#FFB000]" /> Difficulty
                             </label>
-                            <select
-                                className="premium-input w-full bg-[#0a0a0a] font-black uppercase text-[10px] tracking-widest cursor-pointer border-white/10"
-                                value={difficulty}
-                                onChange={(e) => setDifficulty(e.target.value)}
-                            >
-                                <option value="EASY">Beginner: Basic Recall</option>
-                                <option value="MEDIUM">Intermediate: Analysis</option>
-                                <option value="HARD">Expert: Deep Logic</option>
-                            </select>
+
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsDifficultyOpen(!isDifficultyOpen)}
+                                    className="premium-input w-full bg-[#0a0a0a] font-black uppercase text-[10px] tracking-widest border-white/10 py-4 px-6 flex items-center justify-between group transition-all"
+                                >
+                                    <span>{difficultyOptions.find(o => o.id === difficulty)?.label}</span>
+                                    <ChevronDown className={cn("w-4 h-4 text-gray-500 transition-transform duration-300", isDifficultyOpen && "rotate-180 text-[#FFB000]")} />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isDifficultyOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            className="absolute top-full left-0 right-0 mt-2 z-50 glass-card bg-[#0a0a0a] border border-white/10 overflow-hidden shadow-2xl"
+                                        >
+                                            {difficultyOptions.map((opt) => (
+                                                <button
+                                                    key={opt.id}
+                                                    onClick={() => {
+                                                        setDifficulty(opt.id);
+                                                        setIsDifficultyOpen(false);
+                                                    }}
+                                                    className={cn(
+                                                        "w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all",
+                                                        difficulty === opt.id
+                                                            ? "bg-[#FFB000] text-black"
+                                                            : "text-gray-400 hover:bg-white/5 hover:text-white"
+                                                    )}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </div>
+
                         <div className="space-y-4">
-                            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 flex items-center gap-2">
-                                <Hash className="w-3 h-3" /> How many questions?
+                            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 flex items-center gap-2">
+                                <Hash className="w-3 h-3 text-[#00f0ff]" /> Questions
                             </label>
                             <div className="relative">
                                 <input
                                     type="number"
-                                    className="premium-input w-full font-black uppercase text-xl tracking-tighter"
+                                    className="premium-input w-full font-black uppercase text-xl tracking-tighter py-3"
                                     min={1} max={50}
                                     value={qCount}
                                     onChange={(e) => setQCount(Number(e.target.value))}
                                 />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-700 tracking-widest">ITEMS</span>
+                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-500 tracking-widest">QTY</span>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 flex items-center gap-2">
+                                <Timer className="w-3 h-3 text-purple-400" /> Duration
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type="number"
+                                    className="premium-input w-full font-black uppercase text-xl tracking-tighter py-3"
+                                    min={1} max={120}
+                                    value={duration}
+                                    onChange={(e) => setDuration(Number(e.target.value))}
+                                />
+                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-500 tracking-widest">MINS</span>
                             </div>
                         </div>
                     </div>

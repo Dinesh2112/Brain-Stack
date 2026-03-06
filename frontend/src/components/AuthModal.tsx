@@ -6,7 +6,6 @@ import {
     Mail,
     Lock,
     X,
-    Github,
     ArrowRight,
     Chrome,
     Shield
@@ -133,14 +132,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                         )}
 
                         <div className="space-y-4">
-                            <button
-                                onClick={() => handleSocialLogin('GitHub')}
-                                disabled={isLoading}
-                                className="w-full premium-button secondary justify-center py-4 bg-white/[0.03] border-white/10 hover:bg-white/5"
-                            >
-                                <Github className="w-5 h-5" />
-                                <span>Continue with GitHub</span>
-                            </button>
+
                             <button
                                 onClick={() => handleSocialLogin('Google')}
                                 disabled={isLoading}

@@ -5,9 +5,9 @@ dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 const PRIMARY_MODEL = "gemini-1.5-flash";
+const FALLBACK_MODEL = "gemini-1.5-flash-latest";
 
 export interface MCQ {
-
     question: string;
     options: string[];
     correctAnswer: string;
@@ -19,15 +19,16 @@ export interface MCQ {
 export class GeminiService {
     private model: any;
 
-    private getModel() {
-        if (this.model) return this.model;
+    private getModel(useFallback: boolean = false) {
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
             console.error("[GEMINI] CRITICAL: GEMINI_API_KEY is missing from environment.");
             throw new Error("AI Service configuration missing.");
         }
-        this.model = genAI.getGenerativeModel({ model: PRIMARY_MODEL });
-        console.log(`[GEMINI] Service initialized with model: ${PRIMARY_MODEL}`);
+
+        const modelName = useFallback ? FALLBACK_MODEL : PRIMARY_MODEL;
+        this.model = genAI.getGenerativeModel({ model: modelName });
+        console.log(`[GEMINI] Service initialized with model: ${modelName}`);
         return this.model;
     }
 
@@ -35,11 +36,8 @@ export class GeminiService {
         // Model initialized lazily when needed
     }
 
-
-
     private chunkContent(content: string, maxLen: number = 20000): string {
         if (content.length <= maxLen) return content;
-        // Basic strategy: Take the first part, middle part and end part to get a decent coverage
         const third = Math.floor(maxLen / 3);
         const start = content.substring(0, third);
         const mid = content.substring(content.length / 2 - third / 2, content.length / 2 + third / 2);
@@ -48,10 +46,10 @@ export class GeminiService {
     }
 
     async generateMCQs(content: string, count: number = 5, difficulty: string = "MEDIUM", retryCount: number = 2): Promise<MCQ[]> {
-        const activeModel = this.getModel();
-        console.log(`[GEMINI] Generating MCQs with model: ${activeModel.model}...`);
+        // Use the current model or initialize it
+        const currentModel = this.model || this.getModel(retryCount === 0);
+        console.log(`[GEMINI] Generating MCQs with model: ${PRIMARY_MODEL}...`);
         const processedContent = this.chunkContent(content);
-
 
         const prompt = `
       You are an expert educational AI specialized in ${difficulty} level assessments. 
@@ -80,29 +78,33 @@ export class GeminiService {
     `;
 
         try {
-            const result = await this.model.generateContent(prompt);
+            const result = await currentModel.generateContent(prompt);
             const response = await result.response;
             const text = response.text();
 
-            // Clean the response (sometimes Gemini adds json blocks)
             const jsonMatch = text.match(/\[.*\]/s);
             if (!jsonMatch) {
                 throw new Error("Invalid response format from AI");
             }
             return JSON.parse(jsonMatch[0]);
         } catch (error: any) {
+            // Handle 404 by switching model
+            if (error.status === 404 || error.message.includes("404") || error.message.includes("not found")) {
+                console.warn(`[GEMINI] Model ${PRIMARY_MODEL} not found. Retrying with fallback...`);
+                this.model = this.getModel(true); // Switch to fallback
+                if (retryCount > 0) {
+                    return this.generateMCQs(content, count, difficulty, retryCount - 1);
+                }
+            }
+
             // Retry logic for 503 / Service Unavailable
             if (retryCount > 0 && (error.message.includes("503") || error.message.includes("Service Unavailable") || error.message.includes("overloaded"))) {
                 console.warn(`[GEMINI] Service busy, retrying... (${retryCount} retries left)`);
-                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 return this.generateMCQs(content, count, difficulty, retryCount - 1);
             }
 
-            console.error("Gemini Error Details:", {
-                message: error.message,
-                stack: error.stack,
-                details: error.response?.data || error
-            });
+            console.error("Gemini Error Details:", error);
             throw new Error(`Failed to generate MCQs: ${error.message}`);
         }
     }

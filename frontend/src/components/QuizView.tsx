@@ -11,7 +11,9 @@ import {
     Timer,
     Volume2,
     VolumeX,
-    Target
+    Target,
+    Trophy,
+    Layout
 } from 'lucide-react';
 import { MCQ } from '../types/mcq';
 import { clsx, type ClassValue } from 'clsx';
@@ -23,14 +25,15 @@ function cn(...inputs: ClassValue[]) {
 
 interface QuizViewProps {
     mcqs: MCQ[];
+    durationMinutes: number;
     onFinish: (finalMcqs: MCQ[], totalTime: number) => void;
     onCancel: () => void;
 }
 
-export const QuizView: React.FC<QuizViewProps> = ({ mcqs, onFinish, onCancel }) => {
+export const QuizView: React.FC<QuizViewProps> = ({ mcqs, durationMinutes, onFinish, onCancel }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<number, string>>({});
-    const [timeLeft, setTimeLeft] = useState(mcqs.length * 60); // 60s per question
+    const [timeLeft, setTimeLeft] = useState(durationMinutes * 60);
     const [isVoiceOn, setIsVoiceOn] = useState(false);
 
     useEffect(() => {
@@ -39,6 +42,10 @@ export const QuizView: React.FC<QuizViewProps> = ({ mcqs, onFinish, onCancel }) 
         }, 1000);
         return () => clearInterval(timer);
     }, []);
+
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [currentIndex]);
 
     const handleAnswer = (answer: string) => {
         setAnswers({ ...answers, [currentIndex]: answer });
@@ -58,7 +65,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ mcqs, onFinish, onCancel }) 
             userAnswer: answers[idx],
             isCorrect: answers[idx] === m.correctAnswer
         }));
-        onFinish(finalMcqs, (mcqs.length * 60) - timeLeft);
+        onFinish(finalMcqs, (durationMinutes * 60) - timeLeft);
     };
 
     const formatTime = (seconds: number) => {

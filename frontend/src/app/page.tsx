@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
-  Github,
+
   BookOpen,
   Zap,
   ShieldCheck,
@@ -44,8 +44,15 @@ export default function Home() {
     window.location.reload();
   };
 
-  const startQuiz = (generatedMcqs: MCQ[]) => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [view]);
+
+  const [quizDuration, setQuizDuration] = useState(10); // Minutes
+
+  const startQuiz = (generatedMcqs: MCQ[], durationMinutes: number) => {
     setMcqs(generatedMcqs);
+    setQuizDuration(durationMinutes);
     setView('QUIZ');
   };
 
@@ -76,14 +83,14 @@ export default function Home() {
             </div>
             <div className="leading-tight">
               <h1 className="text-xl font-black tracking-tighter text-white">BRAIN<span className="text-[#FFB000]">STACK</span>.AI</h1>
-              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Neural Assessment Engine</p>
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Neural Assessment Engine</p>
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center gap-10 text-[13px] font-bold uppercase tracking-widest text-gray-400">
-            <a href="#features" className="hover:text-white transition-all hover:scale-105">Features</a>
-            <a href="#pricing" className="hover:text-white transition-all hover:scale-105">Pricing</a>
-            <a href="#about" className="hover:text-white transition-all hover:scale-105">About</a>
+          <div className="hidden lg:flex items-center gap-10 text-[13px] font-extrabold uppercase tracking-widest text-gray-200">
+            <a href="#features" className="hover:text-[#FFB000] transition-all hover:scale-105">Features</a>
+            <a href="#architecture" className="hover:text-[#FFB000] transition-all hover:scale-105">Architecture</a>
+            <a href="#about" className="hover:text-[#FFB000] transition-all hover:scale-105">Technology</a>
           </div>
 
 
@@ -105,12 +112,12 @@ export default function Home() {
               <>
                 <button
                   onClick={() => setIsAuthOpen(true)}
-                  className="text-sm font-bold text-gray-400 hover:text-white transition-colors px-4"
+                  className="text-sm font-bold text-gray-200 hover:text-[#FFB000] transition-colors px-4"
                 >
                   Log In
                 </button>
                 <button
-                  onClick={() => setIsAuthOpen(true)}
+                  onClick={() => document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' })}
                   className="premium-button primary"
                 >
                   Start Now <ArrowRight className="w-4 h-4 text-black" />
@@ -142,7 +149,7 @@ export default function Home() {
                 </motion.div>
 
                 <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.85] text-white">
-                  Master Any <span className="text-gradient">Topic.</span><br />
+                  Master Any  Topic.
                   Faster Than Ever.
                 </h1>
 
@@ -152,13 +159,13 @@ export default function Home() {
                 </p>
 
                 <div className="flex flex-wrap items-center justify-center gap-8 pt-6">
-                  <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+                  <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-gray-200">
                     <div className="w-2 h-2 rounded-full bg-[#FFB000]" /> Instant Scan
                   </div>
-                  <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+                  <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-gray-200">
                     <div className="w-2 h-2 rounded-full bg-[#00f0ff]" /> Smart Questions
                   </div>
-                  <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+                  <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-gray-200">
                     <div className="w-2 h-2 rounded-full bg-purple-500" /> Easy Analytics
                   </div>
                 </div>
@@ -183,66 +190,75 @@ export default function Home() {
                 <div className="glass-card p-10 border-b-2 border-b-[#00f0ff80]">
                   <Globe className="w-8 h-8 text-[#00f0ff] mb-6" />
                   <h4 className="text-xl font-bold mb-2">Website Scanner</h4>
-                  <p className="text-sm text-gray-400">Paste any article or link. We'll automatically turn it into a test.</p>
+                  <p className="text-sm text-gray-200 leading-relaxed">Paste any article or link. We'll automatically turn it into a test.</p>
                 </div>
 
                 <div className="glass-card p-10 border-b-2 border-b-purple-500/50">
                   <FileText className="w-8 h-8 text-purple-400 mb-6" />
                   <h4 className="text-xl font-bold mb-2">PDF & Word</h4>
-                  <p className="text-sm text-gray-400">Full support for your own notes and document files with high accuracy.</p>
+                  <p className="text-sm text-gray-200 leading-relaxed">Full support for your own notes and document files with high accuracy.</p>
                 </div>
               </section>
 
-              {/* Minimalist Pricing */}
-              <section id="pricing" className="max-w-[1400px] mx-auto px-8 py-32 scroll-mt-32 border-t border-white/[0.1]">
-                <div className="flex flex-col md:flex-row justify-between items-end gap-10 mb-20">
-                  <div className="max-w-xl">
-                    <h2 className="text-5xl font-black mb-6">Simple Pricing.</h2>
-                    <p className="text-gray-400 font-medium">Choose a plan that fits your learning needs. No hidden fees.</p>
-                  </div>
-                  <div className="flex items-center gap-2 p-1 bg-white/[0.05] rounded-lg border border-white/10">
-                    <button className="px-6 py-2 bg-white text-black text-[11px] font-black uppercase rounded-md shadow-lg">Monthly</button>
-                    <button className="px-6 py-2 text-[11px] font-bold uppercase text-gray-500">Yearly</button>
-                  </div>
+              {/* Technical Pipeline Visualization */}
+              <section id="architecture" className="max-w-[1400px] mx-auto px-8 py-32 border-t border-white/[0.1] scroll-mt-32">
+                <div className="text-center mb-20 space-y-4">
+                  <h2 className="text-5xl font-black tracking-tighter">The Neural Pipeline.</h2>
+                  <p className="text-gray-300 font-medium text-lg max-w-2xl mx-auto">How we transform raw data into high-precision engineering assessments.</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <div className="glass-card p-12 bg-white/[0.02]">
-                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-gray-500 mb-2">Starter</h3>
-                    <p className="text-5xl font-black mb-10">$0</p>
-                    <ul className="space-y-4 mb-12">
-                      {['5 Practice Tests', 'Basic Analytics', 'Standard AI'].map(f => (
-                        <li key={f} className="flex items-center gap-3 text-sm text-gray-400 font-bold">
-                          <ShieldCheck className="w-4 h-4 text-gray-600" /> {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <button className="w-full premium-button secondary">Free Plan</button>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+                  {/* Pipeline Step 1 */}
+                  <div className="glass-card p-8 bg-white/[0.02] border-t-2 border-t-[#FFB000] relative group">
+                    <div className="w-12 h-12 rounded-lg bg-[#FFB00011] flex items-center justify-center mb-6">
+                      <Globe className="w-6 h-6 text-[#FFB000]" />
+                    </div>
+                    <h4 className="text-lg font-black mb-3">Ingestion</h4>
+                    <p className="text-gray-400 text-xs font-bold leading-relaxed uppercase tracking-wider">
+                      OCR, JSDOM Parsing, and Multi-format extraction for websites, PDFs, and raw text.
+                    </p>
+                    <div className="hidden md:block absolute top-1/2 -right-4 translate-x-1/2 -translate-y-1/2 z-10">
+                      <ArrowRight className="w-6 h-6 text-white/10" />
+                    </div>
                   </div>
 
-                  <div className="glass-card p-12 border-2 border-[#FFB00033] bg-[#FFB0000a]">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-sm font-black uppercase tracking-[0.3em] text-[#FFB000]">Pro Learner</h3>
-                      <span className="text-[10px] font-black px-2 py-1 bg-[#FFB000] text-black rounded uppercase">Best Value</span>
+                  {/* Pipeline Step 2 */}
+                  <div className="glass-card p-8 bg-white/[0.02] border-t-2 border-t-[#00f0ff]">
+                    <div className="w-12 h-12 rounded-lg bg-[#00f0ff11] flex items-center justify-center mb-6">
+                      <Brain className="w-6 h-6 text-[#00f0ff]" />
                     </div>
-                    <p className="text-5xl font-black mb-10">$19</p>
-                    <ul className="space-y-4 mb-12">
-                      {['Unlimited Tests', 'Advanced AI Models', 'Priority Scanning', 'Score History'].map(f => (
-                        <li key={f} className="flex items-center gap-3 text-sm text-gray-100 font-bold">
-                          <Zap className="w-4 h-4 text-[#FFB000] fill-current" /> {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <button className="w-full premium-button primary">Upgrade Now</button>
+                    <h4 className="text-lg font-black mb-3">Contextualizing</h4>
+                    <p className="text-gray-400 text-xs font-bold leading-relaxed uppercase tracking-wider">
+                      Vector embeddings and semantic analysis to find the core logic within the data.
+                    </p>
+                    <div className="hidden md:block absolute top-1/2 -right-4 translate-x-1/2 -translate-y-1/2 z-10">
+                      <ArrowRight className="w-6 h-6 text-white/10" />
+                    </div>
                   </div>
 
-                  <div className="glass-card p-12 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-sm font-black uppercase tracking-[0.3em] text-gray-500 mb-2">Team</h3>
-                      <p className="text-3xl font-black mb-10 text-gray-400">Custom</p>
-                      <p className="text-gray-300 text-sm leading-relaxed mb-8 font-medium">For schools and companies that need multi-user access and dedicated features.</p>
+                  {/* Pipeline Step 3 */}
+                  <div className="glass-card p-8 bg-white/[0.02] border-t-2 border-t-purple-500">
+                    <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center mb-6">
+                      <Cpu className="w-6 h-6 text-purple-400" />
                     </div>
-                    <button className="w-full premium-button secondary">Contact Us</button>
+                    <h4 className="text-lg font-black mb-3">Generation</h4>
+                    <p className="text-gray-400 text-xs font-bold leading-relaxed uppercase tracking-wider">
+                      Chain-of-thought prompting via Gemini & GPT-4o to craft distracting yet logical options.
+                    </p>
+                    <div className="hidden md:block absolute top-1/2 -right-4 translate-x-1/2 -translate-y-1/2 z-10">
+                      <ArrowRight className="w-6 h-6 text-white/10" />
+                    </div>
+                  </div>
+
+                  {/* Pipeline Step 4 */}
+                  <div className="glass-card p-8 bg-[#ccff000a] border-t-2 border-t-[#ccff00]">
+                    <div className="w-12 h-12 rounded-lg bg-[#ccff0011] flex items-center justify-center mb-6">
+                      <ShieldCheck className="w-6 h-6 text-[#ccff00]" />
+                    </div>
+                    <h4 className="text-lg font-black mb-3">Validation</h4>
+                    <p className="text-gray-400 text-xs font-bold leading-relaxed uppercase tracking-wider">
+                      Self-Correction Loops and Hallucination Checks prior to assessment deployment.
+                    </p>
                   </div>
                 </div>
               </section>
@@ -258,9 +274,9 @@ export default function Home() {
                       Built for <br />
                       <span className="text-gradient">Precision & Scale.</span>
                     </h2>
-                    <p className="text-gray-400 font-medium leading-relaxed max-w-xl">
+                    <p className="text-gray-200 text-lg font-medium leading-relaxed max-w-xl">
                       BRAINSTACK.AI isn't just a wrapper. It's a multi-layered neural engine designed to solve the "Hallucination Problem" in AI-generated assessments. By combining symbolic parsing with large language models, we ensure academic-grade accuracy.
-                    </p>
+                    </p>@
 
                     <div className="grid grid-cols-2 gap-6">
                       <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
@@ -337,6 +353,7 @@ export default function Home() {
             >
               <QuizView
                 mcqs={mcqs}
+                durationMinutes={quizDuration}
                 onFinish={finishQuiz}
                 onCancel={goHome}
               />
@@ -370,16 +387,16 @@ export default function Home() {
               <Brain className="w-5 h-5 text-gray-700" />
               <h1 className="text-sm font-black uppercase tracking-[0.5em] text-gray-600">BRAINSTACK.AI</h1>
             </div>
-            <p className="text-[11px] font-bold text-gray-700 uppercase tracking-widest leading-loose">
+            <p className="text-[11px] font-bold text-gray-300 uppercase tracking-widest leading-loose">
               Advanced AI Learning Platform <br />
               Ref: IQ-2026 / Built for Success
             </p>
           </div>
 
-          <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.2em] text-gray-600">
-            <a href="#" className="hover:text-[#ccff00] transition-colors">Privacy</a>
-            <a href="#" className="hover:text-[#ccff00] transition-colors">Terms</a>
-            <a href="#" className="hover:text-[#ccff00] transition-colors">GitHub</a>
+          <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
+            <a href="#about" className="hover:text-[#FFB000] transition-colors">Documentation</a>
+            <a href="#architecture" className="hover:text-[#FFB000] transition-colors">Architecture</a>
+
           </div>
         </div>
       </footer>
