@@ -72,18 +72,18 @@ export default function Home() {
       <AIGlow />
 
       {/* Modern Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-8 py-6 border-b border-white/[0.05] bg-black/60 backdrop-blur-3xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 py-4 md:py-6 border-b border-white/[0.05] bg-black/60 backdrop-blur-3xl">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
           <div
-            className="flex items-center gap-4 cursor-pointer group"
+            className="flex items-center gap-2 md:gap-4 cursor-pointer group"
             onClick={goHome}
           >
-            <div className="w-10 h-10 bg-[#FFB000] rounded-lg flex items-center justify-center rotate-3 group-hover:rotate-0 transition-all duration-500 shadow-[0_0_20px_rgba(255,176,0,0.3)]">
-              <Brain className="w-6 h-6 text-black fill-current" />
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-[#FFB000] rounded-lg flex items-center justify-center rotate-3 group-hover:rotate-0 transition-all duration-500 shadow-[0_0_20px_rgba(255,176,0,0.3)] shrink-0">
+              <Brain className="w-5 h-5 md:w-6 md:h-6 text-black fill-current" />
             </div>
             <div className="leading-tight">
-              <h1 className="text-xl font-black tracking-tighter text-white">BRAIN<span className="text-[#FFB000]">STACK</span>.AI</h1>
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Neural Assessment Engine</p>
+              <h1 className="text-base md:text-xl font-black tracking-tighter text-white">BRAIN<span className="text-[#FFB000]">STACK</span><span className="hidden sm:inline">.AI</span></h1>
+              <p className="hidden sm:block text-[8px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest">Neural Assessment Engine</p>
             </div>
           </div>
 
@@ -94,16 +94,16 @@ export default function Home() {
           </div>
 
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             {user ? (
-              <div className="flex items-center gap-6">
-                <div className="flex flex-col items-end">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Authorized User</span>
-                  <span className="text-sm font-black text-white">{user.name}</span>
+              <div className="flex items-center gap-3 md:gap-6">
+                <div className="hidden sm:flex flex-col items-end">
+                  <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-gray-500">Authorized</span>
+                  <span className="text-xs md:text-sm font-black text-white truncate max-w-[80px]">{user.name}</span>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-400 transition-colors border border-red-500/20 px-3 py-1 rounded-md"
+                  className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-400 transition-colors border border-red-500/20 px-2 py-1 md:px-3 rounded-md"
                 >
                   Sign Out
                 </button>
@@ -112,15 +112,17 @@ export default function Home() {
               <>
                 <button
                   onClick={() => setIsAuthOpen(true)}
-                  className="text-sm font-bold text-gray-200 hover:text-[#FFB000] transition-colors px-4"
+                  className="text-xs md:text-sm font-bold text-gray-200 hover:text-[#FFB000] transition-colors px-2 md:px-4"
                 >
                   Log In
                 </button>
                 <button
                   onClick={() => document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="premium-button primary"
+                  className="premium-button primary shrink-0"
                 >
-                  Start Now <ArrowRight className="w-4 h-4 text-black" />
+                  <span className="hidden sm:inline">Start Now</span>
+                  <span className="sm:hidden">Start</span>
+                  <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-black" />
                 </button>
               </>
             )}

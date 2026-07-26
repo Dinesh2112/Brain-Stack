@@ -58,7 +58,7 @@ body::before {
   
   /* Premium Buttons */
   .premium-button {
-    @apply relative inline-flex items-center gap-2 px-8 py-4 rounded-xl font-black uppercase tracking-widest transition-all duration-300 active:scale-95;
+    @apply relative inline-flex items-center gap-2 px-4 py-3 md:px-8 md:py-4 rounded-xl font-black uppercase tracking-widest transition-all duration-300 active:scale-95 text-xs md:text-sm;
   }
   
   .premium-button.primary {
@@ -174,4 +174,38 @@ body::before {
 h1, h2, h3, h4 {
   letter-spacing: -0.04em;
   font-weight: 800;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .glass-card {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    color: black !important;
+  }
+  
+  /* Force dark text to be readable on white paper */
+  .text-white, .text-gray-400, .text-gray-500, .text-gray-600, .text-gray-700 {
+    color: #111827 !important;
+  }
+
+  /* Keep brand colors visible */
+  .text-\[\#FFB000\] { color: #d97706 !important; }
+  .text-\[\#ccff00\] { color: #65a30d !important; }
+  
+  /* Fix borders for print */
+  .border-white\/5, .border-white\/10, .border-white\/\[0\.05\], .border-white\/\[0\.08\] {
+    border-color: #e5e7eb !important;
+  }
+  
+  /* Remove heavy black backgrounds */
+  .bg-black\/20, .bg-black\/40, .bg-black\/60, .bg-black\/80, .bg-black {
+    background: transparent !important;
+  }
 }

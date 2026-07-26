@@ -202,12 +202,12 @@ export const QuizView: React.FC<QuizViewProps> = ({ mcqs, durationMinutes, onFin
                         <button
                             onClick={handleNext}
                             disabled={!answers[currentIndex]}
-                            className="premium-button primary group h-16 px-12"
+                            className="premium-button primary group h-14 md:h-16 px-6 md:px-12"
                         >
-                            <span className="text-xl font-black uppercase tracking-tighter text-black">
+                            <span className="text-base md:text-xl font-black uppercase tracking-tighter text-black">
                                 {currentIndex === mcqs.length - 1 ? 'Finish Test' : 'Next Question'}
                             </span>
-                            <ArrowRight className="w-6 h-6 text-black group-hover:translate-x-2 transition-all" />
+                            <ArrowRight className="w-5 h-5 md:w-6 md:h-6 text-black group-hover:translate-x-2 transition-all" />
                         </button>
                     </div>
                 </div>

@@ -321,9 +321,9 @@ export const Generator: React.FC<GeneratorProps> = ({ onMCQsGenerated }) => {
                             </>
                         ) : (
                             <>
-                                <Trophy className="w-6 h-6 text-black group-hover:rotate-12 transition-transform" />
-                                <span className="text-xl uppercase font-black tracking-tighter text-black">Generate Practice Test</span>
-                                <ArrowRight className="w-5 h-5 text-black group-hover:translate-x-2 transition-transform" />
+                                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-black group-hover:rotate-12 transition-transform" />
+                                <span className="text-base sm:text-xl uppercase font-black tracking-tighter text-black">Generate Practice Test</span>
+                                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-black group-hover:translate-x-2 transition-transform" />
                             </>
                         )}
                     </button>
